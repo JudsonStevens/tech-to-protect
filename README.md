@@ -14,9 +14,10 @@
     - Possibly solve each room from entrance
     - Once quickest route is found, solve all rooms from next point
       - Example - door, room 1, room 2, room 3
-        - door to room 1 is fastest after solving all 3 options
-        - calculate room 1 to room 2 and 3
-        - room 1 to 3 is fastest
+        - door to room 1 is fastest after calculating all 3 options
+        - solve door to 1
+        - room 1 to room 3 is fastest after calculating room 1 to room 2 and 3
+        - solve room 1 to 3
         - solve room 3 to 2
         - solve room 2 to door
     - How to add in stairs?
