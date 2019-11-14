@@ -1,4 +1,4 @@
-# Tech To Protect Traveling Salesman
+# Tech To Protect
 
 ## Thoughts
   - Issue is finding the route to each point with distances and weights for hazards
