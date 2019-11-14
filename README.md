@@ -24,4 +24,9 @@
       - Some large penalty
       - Will take some work to turn into maze
       - Start second maze from entry/exit point of stairs
-      
+## 2D Mapping of Point Cloud
+  - Take slices of the point cloud file
+    - First calculate max and min
+    - Iterate in .3-.4 sized slices (maybe smaller if range is smaller?)
+    - Generate/save new photo for each slice
+    - Use Docker copy/mount to make files accessible to user
