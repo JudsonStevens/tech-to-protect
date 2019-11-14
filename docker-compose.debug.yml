@@ -1,0 +1,10 @@
+version: '2.1'
+
+services:
+  tech-to-protect:
+    image: tech-to-protect
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 3005:3005

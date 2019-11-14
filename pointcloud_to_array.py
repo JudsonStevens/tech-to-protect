@@ -21,46 +21,36 @@ def scale_to_255(a, min, max, dtype=np.uint8):
 #                                                          BIRDS_EYE_POINT_CLOUD
 # ==============================================================================
 def birds_eye_point_cloud(points,
-                          side_range=(-5, 10),
-                          fwd_range=(-5,10),
-                          res=0.01,
-                          min_height = -2,
-                          max_height = 3,
-                          saveto='/home/judson/Documents/example_img - -4 to 5.jpeg'):
+                          side_range=(-10, 10),
+                          fwd_range=(-10,10),
+                          res=0.001,
+                          min_height = -1,
+                          max_height = 1,
+                          saveto='/home/judson/Documents/example_img#32.jpeg'):
   """ Creates an 2D birds eye view representation of the point cloud data.
       You can optionally save the image to specified filename.
-  Args:
-      points:     (numpy array)
-                  N rows of points data
-                  Each point should be specified by at least 3 elements x,y,z
-      side_range: (tuple of two floats)
-                  (-left, right) in metres
-                  left and right limits of rectangle to look at.
-      fwd_range:  (tuple of two floats)
-                  (-behind, front) in metres
-                  back and front limits of rectangle to look at.
-      res:        (float) desired resolution in metres to use
-                  Each output pixel will represent an square region res x res
-                  in size.
-      min_height:  (float)(default=-2.73)
-                  Used to truncate height values to this minumum height
-                  relative to the sensor (in metres).
-                  The default is set to -2.73, which is 1 metre below a flat
-                  road surface given the configuration in the kitti dataset.
-      max_height: (float)(default=1.27)
-                  Used to truncate height values to this maximum height
-                  relative to the sensor (in metres).
-                  The default is set to 1.27, which is 3m above a flat road
-                  surface given the configuration in the kitti dataset.
-      saveto:     (str or None)(default=None)
-                  Filename to save the image as.
-                  If None, then it just displays the image.
   """
   x_lidar = points[:, 0]
   y_lidar = points[:, 1]
   z_lidar = points[:, 2]
   # r_lidar = points[:, 3]  # Reflectance
+  min_value = min(z_lidar)
+  max_value = max(z_lidar)
+  print(f'Minimum value = {min_value}, maximum value = {max_value}')
+  first_set = np.where(z_lidar > max_value - 3)
+  second_set = np.where(z_lidar < min_value + 3)
+  indices_to_delete = np.setxor1d(first_set, second_set)
+  # indices_to_delete = np.where(np.logical_and((z_lidar > (max_value - 3.5)), (z_lidar < min_value + 3)))
+  if len(indices_to_delete) == 0:
+    raise Exception("No indices were found to delete.")
+  print(indices_to_delete)
+  print(len(z_lidar))
+  print(len(indices_to_delete))
+  x_lidar = np.delete(x_lidar, indices_to_delete)
+  y_lidar = np.delete(y_lidar, indices_to_delete)
+  z_lidar = np.delete(z_lidar, indices_to_delete)
 
+  print(len(z_lidar))
   # INDICES FILTER - of values within the desired rectangle
   # Note left side is positive y axis in LIDAR coordinates
   ff = np.logical_and((x_lidar > fwd_range[0]), (x_lidar < fwd_range[1]))
@@ -104,3 +94,32 @@ def birds_eye_point_cloud(points,
 
 if __name__ == "__main__":
   main(sys.argv[1:])
+
+'''
+  Args:
+      points:     (numpy array)
+                  N rows of points data
+                  Each point should be specified by at least 3 elements x,y,z
+      side_range: (tuple of two floats)
+                  (-left, right) in metres
+                  left and right limits of rectangle to look at.
+      fwd_range:  (tuple of two floats)
+                  (-behind, front) in metres
+                  back and front limits of rectangle to look at.
+      res:        (float) desired resolution in metres to use
+                  Each output pixel will represent an square region res x res
+                  in size.
+      min_height:  (float)(default=-2.73)
+                  Used to truncate height values to this minumum height
+                  relative to the sensor (in metres).
+                  The default is set to -2.73, which is 1 metre below a flat
+                  road surface given the configuration in the kitti dataset.
+      max_height: (float)(default=1.27)
+                  Used to truncate height values to this maximum height
+                  relative to the sensor (in metres).
+                  The default is set to 1.27, which is 3m above a flat road
+                  surface given the configuration in the kitti dataset.
+      saveto:     (str or None)(default=None)
+                  Filename to save the image as.
+                  If None, then it just displays the image.
+'''
