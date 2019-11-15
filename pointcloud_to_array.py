@@ -4,11 +4,17 @@ import matplotlib.pyplot as plt
 import open3d as o3d
 import sys
 
-def main(filepath):
-  pcd = o3d.io.read_point_cloud(filepath[0], format='xyz')
+def main(arguments):
+  pcd = o3d.io.read_point_cloud(arguments[0], format='xyz')
   xyz_load = np.asarray(pcd.points)
-  birds_eye_point_cloud(xyz_load)
-
+  z_values = xyz_load[:,2]
+  step = float(arguments[1])
+  z_max = round(float(max(z_values)), 2)
+  z_min = round(float(min(z_values)), 2)
+  while z_min < (z_max - step):
+    birds_eye_point_cloud(xyz_load, z_min, (z_min + step), z_values)
+    z_min = z_min + step
+    
 # ==============================================================================
 #                                                                   SCALE_TO_255
 # ==============================================================================
@@ -16,33 +22,41 @@ def scale_to_255(a, min, max, dtype=np.uint8):
     """ Scales an array of values from specified min, max range to 0-255
         Optionally specify the data type of the output (default is uint8)
     """
-    return (((a - min) / float(max - min)) * 255).astype(dtype)
+    return (((a - min) / float(abs(max) - min)) * 255).astype(dtype)
 # ==============================================================================
 #                                                          BIRDS_EYE_POINT_CLOUD
 # ==============================================================================
 def birds_eye_point_cloud(points,
-                          side_range=(-10, 10),
-                          fwd_range=(-10,10),
-                          res=0.001,
-                          min_height = -1,
-                          max_height = 1,
-                          saveto='/home/judson/Documents/example_img#32.jpeg'):
+                          z_bottom_section,
+                          z_top_section,
+                          z_lidar,
+                          side_range=(-15, 15),
+                          fwd_range=(-15,15),
+                          res=0.0025,
+                          saveto='/home/judson/Documents/example_img'):
   """ Creates an 2D birds eye view representation of the point cloud data.
       You can optionally save the image to specified filename.
   """
+  max_height = 1.5
+  min_height = -1.5
   x_lidar = points[:, 0]
   y_lidar = points[:, 1]
-  z_lidar = points[:, 2]
+  # z_lidar = points[:, 2]
   # r_lidar = points[:, 3]  # Reflectance
-  min_value = min(z_lidar)
-  max_value = max(z_lidar)
-  print(f'Minimum value = {min_value}, maximum value = {max_value}')
-  first_set = np.where(z_lidar > max_value - 3)
-  second_set = np.where(z_lidar < min_value + 3)
+  # min_value = min(z_lidar)
+  # max_value = max(z_lidar)
+  # print(f'Minimum value = {min_value}, maximum value = {max_value}')
+  
+  # first_set = np.where(z_lidar > max_value - 3)
+  # second_set = np.where(z_lidar < min_value + 3)
+  first_set = np.where(z_lidar > z_top_section)
+  second_set = np.where(z_lidar < z_bottom_section)
   indices_to_delete = np.setxor1d(first_set, second_set)
   # indices_to_delete = np.where(np.logical_and((z_lidar > (max_value - 3.5)), (z_lidar < min_value + 3)))
   if len(indices_to_delete) == 0:
     raise Exception("No indices were found to delete.")
+  print(z_top_section)
+  print(z_bottom_section)
   print(indices_to_delete)
   print(len(z_lidar))
   print(len(indices_to_delete))
@@ -68,11 +82,11 @@ def birds_eye_point_cloud(points,
   y_img -= int(np.floor(fwd_range[0]/res))
   
   # CLIP HEIGHT VALUES - to between min and max heights
-  pixel_values = np.clip(a = z_lidar[indices],
-                          a_min=min_height,
-                          a_max=max_height)
+  # pixel_values = np.clip(a = z_lidar[indices],
+  #                         a_min=min_height,
+  #                         a_max=max_height)
   # RESCALE THE HEIGHT VALUES - to be between the range 0-255
-  pixel_values  = scale_to_255(pixel_values, min=min_height, max=max_height)
+  pixel_values  = scale_to_255(z_lidar[indices], min=z_bottom_section, max=z_top_section)
 
   # FILL PIXEL VALUES IN IMAGE ARRAY
   x_max = int((side_range[1] - side_range[0])/res)
@@ -85,7 +99,7 @@ def birds_eye_point_cloud(points,
   im = Image.fromarray(im)
 
   # import code; code.interact(local=dict(globals(), **locals()))
-  im.save(saveto)
+  im.save(saveto + f'{z_bottom_section}.jpg')
   # SAVE THE IMAGE
   # if saveto is not None:
 
