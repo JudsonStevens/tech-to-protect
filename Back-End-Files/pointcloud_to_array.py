@@ -3,9 +3,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import open3d as o3d
 import sys
+import argparse
 
-def main(argument):
-  pcd = o3d.io.read_point_cloud(argument[0], format='xyz')
+ap = argparse.ArgumentParser()
+
+ap.add_argument("-fp", "--filepath", required=True, help="This is the filepath to the xyz file")
+ap.add_argument("-s", "--step", required=False, help="This is the step to use. Smaller steps generate more files but may compromise image quality")
+ap.add_argument("-o", "--output", required=True, help="This is the filepath to output the images")
+args = vars(ap.parse_args())
+
+def main():
+  pcd = o3d.io.read_point_cloud(args['filepath'], format='xyz')
   xyz_load = np.asarray(pcd.points)
   x_lidar = xyz_load[:, 0]
   y_lidar = xyz_load[:, 1]
@@ -13,12 +21,13 @@ def main(argument):
   min_value = min(z_lidar)
   max_value = max(z_lidar)
   original_size = z_lidar.size
-  if argument[1]:
-    step = float(argument[1])
+  saveto = args['output']
+  if args['step']:
+    step = float(args['step'])
   else:
     step = 0.5
   while min_value < max_value:
-    birds_eye_point_cloud(x_lidar, y_lidar, z_lidar, min_value, max_value, step, original_size)
+    birds_eye_point_cloud(x_lidar, y_lidar, z_lidar, min_value, max_value, step, original_size, saveto)
     min_value = min_value + step
 
 # ==============================================================================
@@ -40,10 +49,11 @@ def birds_eye_point_cloud(
                           max_value,
                           step,
                           original_size,
+                          saveto='/render_app/example_img-min_size-',
                           side_range=(-10, 10),
-                          fwd_range=(-10,10),
+                          fwd_range=(-10, 10),
                           res=0.001,
-                          saveto='/home/judson/Documents/Sliced-Pictures-Comparison/example_img-min_size-'):
+                          ):
   """ Creates an 2D birds eye view representation of the point cloud data.
       You can optionally save the image to specified filename.
 
@@ -68,8 +78,6 @@ def birds_eye_point_cloud(
   y_lidar = np.delete(y_lidar, indices_to_delete)
   z_lidar = np.delete(z_lidar, indices_to_delete)
 
-  # Print out the final length of the z point array.
-  print(len(z_lidar))
 
   # INDICES FILTER - of values within the desired rectangle
   # Note left side is positive y axis in LIDAR coordinates
@@ -104,7 +112,7 @@ def birds_eye_point_cloud(
 
   print(z_lidar.size)
   print(original_size)
-  if im.size > (original_size * .15):
+  if im.size > (original_size * .25):
   # Convert from numpy array to a PIL image
     im = Image.fromarray(im)
     im.save(saveto + f'{round(min_value, 2)}.jpeg')
@@ -112,4 +120,4 @@ def birds_eye_point_cloud(
     print("Array was too small.")
 
 if __name__ == "__main__":
-  main(sys.argv[1:])
+  main()
