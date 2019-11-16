@@ -4,7 +4,7 @@ Currently, this portion of the application is under development. In order to run
 
 ```Python
 pip3 install -r requirements.txt
-python3 pointcloud_to_array.py "[path/to/the/pointcloud]" [step]
+python3 pointcloud_to_array.py -h # This will return the commands needed to run the script.
 ```
 
 where step is equal to the size of the slice. Lower sizes will grab more slices, but may have almost no points in them, producing almost blank images. Depending on the z-axis values of the point cloud file, you may see very detailed images or very fuzzy images. The number of slices will be determined by the range between the min and max values of the z-axis in the point cloud file. Currently each xyz file requires manual intervention in the script in order to produce images that are useful. This will be automated away in time, however. 
