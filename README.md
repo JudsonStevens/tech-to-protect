@@ -18,4 +18,4 @@ Currently we are iterating through the different aspects of this application. We
 All of this information will be verified by the homeowner before being finalized.
 
 ## Presentation Information
-You can find a Canva presentation at [this link](https://www.canva.com/design/DADqzVUakYU/tXl77_Pf179MxeIRib-KvQ/view?utm_content=DADqzVUakYU&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink). 
+You can find a Canva presentation at [this link](https://www.canva.com/design/DADqzVUakYU/tXl77_Pf179MxeIRib-KvQ/view?utm_content=DADqzVUakYU&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink). You can find the three different prototypes at these links - [the sign up process for new users](https://invis.io/8JUVC43CMAG), [the homeowner experience](https://invis.io/CRUVC5ANPB7), and [the firefighter experience](https://invis.io/T8UVBN1MSWK).
