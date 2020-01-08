@@ -6,3 +6,5 @@ services:
     build: .
     ports:
       - 3005:3005
+    volumes:
+      - ./render_app:/render_app
